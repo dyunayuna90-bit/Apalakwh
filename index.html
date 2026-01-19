@@ -2,708 +2,194 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dinduy Notes</title>
-
-    <!-- 1. SUMBER LIBRARY (CDN ONLY - STRICT) -->
-    <script type="importmap">
-      {
-        "imports": {
-          "lit": "https://esm.sh/lit@3.3.0",
-          "@m3e/all": "https://esm.sh/@material/web@1.0.0?bundle" 
-        }
-      }
-    </script>
-    <!-- Note: URL @m3e/all di prompt mungkin alias custom. 
-         Disini saya arahkan ke @material/web asli agar preview jalan, 
-         tapi secara sintaks coding saya tetap pakai <m3e-*> sesuai perintah
-         dan saya buat shim agar tag <m3e-*> merender material web asli. -->
-         
-    <script type="module">
-      import "@m3e/all";
-      // Shim script to make custom <m3e-*> tags work with standard Material Web for this demo
-      // In a real environment with your custom @m3e lib, this wouldn't be needed.
-      import { MdFilledButton } from 'https://esm.sh/@material/web/button/filled-button.js';
-      import { MdOutlinedButton } from 'https://esm.sh/@material/web/button/outlined-button.js';
-      import { MdFilledTonalButton } from 'https://esm.sh/@material/web/button/filled-tonal-button.js';
-      import { MdIcon } from 'https://esm.sh/@material/web/icon/icon.js';
-      import { MdOutlinedTextField } from 'https://esm.sh/@material/web/textfield/outlined-text-field.js';
-      import { MdFilledTextField } from 'https://esm.sh/@material/web/textfield/filled-text-field.js';
-      import { MdFab } from 'https://esm.sh/@material/web/fab/fab.js';
-      import { MdDialog } from 'https://esm.sh/@material/web/dialog/dialog.js';
-      import { MdElevation } from 'https://esm.sh/@material/web/elevation/elevation.js';
-      import { MdRipple } from 'https://esm.sh/@material/web/ripple/ripple.js';
-      import { MdCheckbox } from 'https://esm.sh/@material/web/checkbox/checkbox.js';
-      import { MdIconButton } from 'https://esm.sh/@material/web/iconbutton/icon-button.js';
-
-      // Registering tags to browser so code runs nicely
-      customElements.define('m3e-button', class extends MdFilledButton {});
-      customElements.define('m3e-tonal-button', class extends MdFilledTonalButton {});
-      customElements.define('m3e-text-button', class extends MdOutlinedButton {}); // Fallback for text
-      customElements.define('m3e-icon', class extends MdIcon {});
-      customElements.define('m3e-outlined-field', class extends MdOutlinedTextField {});
-      customElements.define('m3e-filled-field', class extends MdFilledTextField {});
-      customElements.define('m3e-fab', class extends MdFab {});
-      customElements.define('m3e-dialog', class extends MdDialog {});
-      customElements.define('m3e-checkbox', class extends MdCheckbox {});
-      customElements.define('m3e-icon-button', class extends MdIconButton {});
-      
-      // Theme shim
-      class M3ETheme extends HTMLElement {
-        connectedCallback() {
-            this.style.display = 'block';
-            this.style.backgroundColor = 'var(--md-sys-color-background)';
-            this.style.color = 'var(--md-sys-color-on-background)';
-            this.style.minHeight = '100vh';
-            document.body.style.margin = '0';
-        }
-      }
-      customElements.define('m3e-theme', M3ETheme);
-
-      // Card Shim
-      class M3ECard extends HTMLElement {
-        connectedCallback() {
-            this.style.display = 'block';
-            this.style.borderRadius = '16px';
-            this.style.backgroundColor = 'var(--md-sys-color-surface-container-low)';
-            this.style.position = 'relative';
-            this.style.overflow = 'hidden';
-        }
-      }
-      customElements.define('m3e-card', M3ECard);
-
-      // Top App Bar Shim
-      class M3ETopAppBar extends HTMLElement {
-        connectedCallback() {
-            this.style.display = 'flex';
-            this.style.alignItems = 'center';
-            this.style.padding = '8px 16px';
-            this.style.height = '64px';
-            this.style.backgroundColor = 'var(--md-sys-color-surface)';
-        }
-      }
-      customElements.define('m3e-top-app-bar', M3ETopAppBar);
-    </script>
-
-    <!-- Google Fonts for Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catatan Ilham</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
     <style>
-        /* CSS Manual hanya untuk Layout Grid & Animasi logic, 
-           Warna & Typo diserahkan ke Theme sesuai aturan */
-        
         :root {
-            /* Fallback colors if theme fails loading */
             --md-sys-color-background: #141218;
             --md-sys-color-on-background: #E6E1E5;
-            --md-sys-color-surface: #141218;
-            --md-sys-color-surface-container-low: #1D1B20;
-            --md-sys-color-surface-container-high: #2B2930;
-            --md-sys-color-primary: #D0BCFF;
+            --md-sys-color-surface-container: #2B2930;
+            --md-sys-color-primary: #D0BCFF; /* Ungu Material */
             --md-sys-color-on-primary: #381E72;
-            --md-sys-color-secondary-container: #4A4458;
-            --md-sys-color-on-secondary-container: #E8DEF8;
-            --md-sys-color-outline-variant: #49454F;
-            --md-sys-color-error: #F2B8B5;
             font-family: 'Roboto', sans-serif;
         }
 
         body {
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
             margin: 0;
             padding: 0;
-            overscroll-behavior-y: none; /* Prevent pull to refresh */
+            display: flex;
+            justify-content: center;
         }
 
-        /* Layout Structure */
         .app-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Drawer */
-        .drawer {
-            width: 280px;
-            background: var(--md-sys-color-surface-container-low);
-            display: flex;
-            flex-direction: column;
-            padding: 12px;
-            transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(0.2, 0.0, 0, 1.0);
-            position: absolute;
-            z-index: 20;
-            height: 100%;
-            border-top-right-radius: 24px;
-            border-bottom-right-radius: 24px;
-        }
-
-        .drawer.open {
-            transform: translateX(0);
-        }
-
-        .drawer-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 15;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .drawer-overlay.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .logo-area {
-            padding: 24px 16px;
-            font-family: 'Product Sans', sans-serif;
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--md-sys-color-on-background);
-            letter-spacing: -0.5px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
             width: 100%;
+            max-width: 500px;
+            padding: 16px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        /* Top Bar Override */
-        m3e-top-app-bar {
+        /* HEADER */
+        .header {
+            font-size: 28px; /* Display Small */
+            font-weight: 400;
+            padding: 16px 0;
+            color: var(--md-sys-color-on-background);
+        }
+
+        /* INPUT SECTION */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        md-outlined-text-field {
+            width: 100%;
+            --md-outlined-text-field-container-shape: 16px;
+        }
+
+        /* CARD LIST */
+        .note-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* CARD STYLE (Manual override dikit biar mirip M3E) */
+        .note-card {
+            background-color: var(--md-sys-color-surface-container);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
             justify-content: space-between;
-            gap: 12px;
-        }
-        
-        .search-bar {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            background: var(--md-sys-color-surface-container-high);
-            border-radius: 24px;
-            padding: 0 12px;
-            height: 48px;
-            color: var(--md-sys-color-on-surface-variant);
+            align-items: flex-start;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease;
         }
 
-        /* Note Grid (Masonry-like with CSS Grid) */
-        .notes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
-            padding: 16px;
-            overflow-y: auto;
-            align-content: start;
-        }
-
-        /* The Card */
-        m3e-card.note-card {
-            padding: 16px;
-            border: 1px solid var(--md-sys-color-outline-variant);
-            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            user-select: none;
-            touch-action: pan-y; /* Allow vertical scroll, handle horizontal in JS */
-            transform-origin: center;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 180px; /* Default height constraint */
-        }
-
-        m3e-card.note-card.selected {
-            border: 2px solid var(--md-sys-color-primary);
-            background-color: var(--md-sys-color-secondary-container);
-        }
-
-        /* Double Tap Expand Logic */
-        m3e-card.note-card.expanded {
-            grid-column: 1 / -1; /* Span full width */
-            max-height: 500px; /* Large peek height */
-            z-index: 2;
-            box-shadow: 0 4px 8px 3px rgba(0,0,0,0.15);
-        }
-
-        .note-title {
-            font-weight: 700;
+        .note-text {
             font-size: 16px;
-            color: var(--md-sys-color-on-background);
-        }
-        
-        .note-body {
-            font-size: 14px;
-            color: var(--md-sys-color-on-surface-variant);
-            white-space: pre-wrap;
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 6;
-            -webkit-box-orient: vertical;
-            transition: -webkit-line-clamp 0.3s;
+            line-height: 1.5;
+            flex: 1;
+            margin-right: 10px;
         }
 
-        m3e-card.note-card.expanded .note-body {
-            -webkit-line-clamp: 20;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .note-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: auto;
-        }
-
-        .chip {
-            background: rgba(0,0,0,0.1);
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-size: 10px;
-            color: var(--md-sys-color-on-surface-variant);
-        }
-
-        /* Bottom Toolbar / FAB */
-        .fab-container {
-            position: absolute;
-            bottom: 24px;
-            right: 24px;
-        }
-
-        /* Selection Header */
-        .selection-header {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 64px;
-            background: var(--md-sys-color-surface-container-high);
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            z-index: 10;
-            transform: translateY(-100%);
-            transition: transform 0.2s;
-        }
-        .selection-header.active {
-            transform: translateY(0);
-        }
-
-        /* Dialog Styles */
-        .dialog-content {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            width: 100%;
-        }
-        
-        .editor-toolbar {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-        }
-
     </style>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@material/web/": "https://esm.run/@material/web/"
+        }
+      }
+    </script>
+    <script type="module">
+      import '@material/web/all.js';
+      import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+      document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+    </script>
 </head>
 <body>
 
-    <!-- 2. SYSTEM DESAIN & TEMA -->
-    <m3e-theme source-color="#006C51" fallback-style="dark">
-        
-        <div class="app-container">
+    <div class="app-container">
+        <div class="header">Catatan Ilham</div>
+
+        <div class="input-group">
+            <md-outlined-text-field label="Mau nyatet apa hari ini?" id="inputNote">
+            </md-outlined-text-field>
             
-            <!-- Drawer -->
-            <div class="drawer-overlay" id="drawerOverlay"></div>
-            <div class="drawer" id="mainDrawer">
-                <div class="logo-area">Dinduy</div>
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                    <m3e-tonal-button id="btnNotes">
-                        <m3e-icon slot="icon" name="lightbulb"></m3e-icon>
-                        Catatan
-                    </m3e-tonal-button>
-                    <m3e-button variant="text" id="btnExport">
-                        <m3e-icon slot="icon" name="download"></m3e-icon>
-                        Ekspor JSON
-                    </m3e-button>
-                     <m3e-button variant="text" id="btnImport">
-                        <m3e-icon slot="icon" name="upload"></m3e-icon>
-                        Impor JSON
-                        <input type="file" id="fileInput" hidden accept=".json">
-                    </m3e-button>
-                </div>
-            </div>
-
-            <div class="main-content">
-                <!-- 3. HEADER / TOP APP BAR -->
-                <m3e-top-app-bar>
-                    <m3e-icon-button id="menuBtn">
-                        <m3e-icon name="menu"></m3e-icon>
-                    </m3e-icon-button>
-                    
-                    <div class="search-bar" id="searchTrigger">
-                        <m3e-icon name="search"></m3e-icon>
-                        <span style="margin-left: 12px; font-size: 14px; opacity: 0.7;">Cari catatan Dinduy...</span>
-                    </div>
-
-                    <m3e-icon-button id="viewToggle">
-                        <m3e-icon name="grid_view"></m3e-icon>
-                    </m3e-icon-button>
-                    <div style="width: 32px;"></div> <!-- Spacer for profile removal -->
-                </m3e-top-app-bar>
-
-                <!-- Selection Mode Header (Overlay) -->
-                <div class="selection-header" id="selectionHeader">
-                    <m3e-icon-button id="closeSelection">
-                        <m3e-icon name="close"></m3e-icon>
-                    </m3e-icon-button>
-                    <span id="selectionCount" style="flex: 1; margin-left: 16px; font-weight: bold; font-size: 18px;">0</span>
-                    <m3e-icon-button id="batchLabel">
-                        <m3e-icon name="label"></m3e-icon>
-                    </m3e-icon-button>
-                    <m3e-icon-button id="batchDelete">
-                        <m3e-icon name="delete"></m3e-icon>
-                    </m3e-icon-button>
-                </div>
-
-                <!-- Notes Container -->
-                <div class="notes-grid" id="notesGrid">
-                    <!-- Cards will be injected here via JS -->
-                </div>
-
-                <!-- FAB -->
-                <div class="fab-container">
-                    <m3e-fab variant="primary" id="fabAdd">
-                        <m3e-icon slot="icon" name="add"></m3e-icon>
-                    </m3e-fab>
-                </div>
-            </div>
+            <md-filled-button id="btnSave">
+                <md-icon slot="icon">save</md-icon>
+                Simpan
+            </md-filled-button>
         </div>
 
-        <!-- 4. DIALOGS (EDITOR) -->
-        <m3e-dialog id="editorDialog">
-            <div slot="headline">Edit Catatan</div>
-            <div slot="content" class="dialog-content">
-                <m3e-filled-field id="editTitle" label="Judul" type="text"></m3e-filled-field>
-                <m3e-outlined-field id="editContent" label="Catatan" type="textarea" rows="8"></m3e-outlined-field>
-                
-                <!-- Rich Toolbar Simulation -->
-                <div class="editor-toolbar">
-                    <m3e-icon-button><m3e-icon name="format_bold"></m3e-icon></m3e-icon-button>
-                    <m3e-icon-button><m3e-icon name="format_italic"></m3e-icon></m3e-icon-button>
-                    <m3e-icon-button><m3e-icon name="list"></m3e-icon></m3e-icon-button>
-                    <m3e-icon-button><m3e-icon name="check_box"></m3e-icon></m3e-icon-button>
-                    <m3e-icon-button><m3e-icon name="palette"></m3e-icon></m3e-icon-button>
-                </div>
-
-                <m3e-outlined-field id="editTags" label="Label (pisahkan koma)" type="text"></m3e-outlined-field>
+        <div id="listContainer" class="note-list">
             </div>
-            <div slot="actions">
-                <m3e-button variant="text" id="editorCancel">Batal</m3e-button>
-                <m3e-button id="editorSave">Simpan</m3e-button>
-            </div>
-        </m3e-dialog>
-
-    </m3e-theme>
+    </div>
 
     <script>
-        /**
-         * LOGIC CORE - DINDUY APP
-         * Pattern: State-Driven UI Rendering
-         */
+        const input = document.getElementById('inputNote');
+        const btn = document.getElementById('btnSave');
+        const list = document.getElementById('listContainer');
 
-        // State Store
-        let state = {
-            notes: [
-                { id: '1', title: 'Belanja Bulanan', content: 'Susu, Telur, Kopi Ziga, Cat Air baru untuk kanvas.', tags: ['Penting', 'Belanja'], color: 'default', expanded: false },
-                { id: '2', title: 'Ide Lukisan', content: 'Konsep semi realism: Wajah manusia tapi setengahnya adalah akar pohon. Background nebula fisika.', tags: ['Art', 'Project'], color: 'default', expanded: false },
-                { id: '3', title: 'Jadwal Kuliah', content: 'Senin: Sejarah Indonesia Kuno\nSelasa: Metodologi Penelitian\nRabu: Libur (Ngelukis)\nKamis: Bimbingan.', tags: ['UNJ'], color: 'default', expanded: false },
-                { id: '4', title: 'Tentang Dinda', content: 'Ultah bentar lagi. Hadiah: Buku Fisika Quantum atau Sketsa wajah dia? Mending sketsa aja kali ya.', tags: ['Love'], color: 'default', expanded: false }
-            ],
-            selectionMode: false,
-            selectedIds: new Set(),
-            searchQuery: ''
-        };
+        // Data Awal (Dummy) biar gak kosong pas lu buka
+        const defaultNotes = [
+            "Beli cat air baru buat kanvas semi-realism",
+            "Jadwal kuliah Sejarah: Besok jam 8 pagi",
+            "Tentang Dinda: Jangan lupa kasih kado buku Fisika Quantum"
+        ];
 
-        // DOM Elements
-        const notesGrid = document.getElementById('notesGrid');
-        const selectionHeader = document.getElementById('selectionHeader');
-        const selectionCount = document.getElementById('selectionCount');
-        const editorDialog = document.getElementById('editorDialog');
-        
-        // --- RENDERING ENGINE ---
-        function render() {
-            notesGrid.innerHTML = '';
-            
-            // Filter notes
-            const filteredNotes = state.notes.filter(n => 
-                n.title.toLowerCase().includes(state.searchQuery.toLowerCase()) || 
-                n.content.toLowerCase().includes(state.searchQuery.toLowerCase())
-            );
+        // Load saat aplikasi dibuka
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = JSON.parse(localStorage.getItem('ilham_notes'));
+            if (!saved || saved.length === 0) {
+                // Kalo kosong, pake data dummy dulu
+                renderAll(defaultNotes);
+                localStorage.setItem('ilham_notes', JSON.stringify(defaultNotes));
+            } else {
+                renderAll(saved);
+            }
+        });
 
-            filteredNotes.forEach(note => {
-                const el = document.createElement('m3e-card');
-                el.className = `note-card ${state.selectedIds.has(note.id) ? 'selected' : ''} ${note.expanded ? 'expanded' : ''}`;
-                el.id = note.id;
+        // Klik Tombol Simpan
+        btn.addEventListener('click', () => {
+            const val = input.value;
+            if(!val) return;
 
-                // Content
-                const titleHtml = note.title ? `<div class="note-title">${note.title}</div>` : '';
-                const tagsHtml = note.tags.length ? `<div class="note-chips">${note.tags.map(t => `<span class="chip">#${t}</span>`).join('')}</div>` : '';
-                
-                el.innerHTML = `
-                    ${titleHtml}
-                    <div class="note-body">${note.content}</div>
-                    ${tagsHtml}
+            const notes = getNotes();
+            notes.unshift(val); // Tambah ke paling atas
+            save(notes);
+            renderAll(notes);
+            input.value = ''; // Reset input
+        });
+
+        // Fungsi Baca Data
+        function getNotes() {
+            return JSON.parse(localStorage.getItem('ilham_notes') || '[]');
+        }
+
+        // Fungsi Simpan ke HP
+        function save(data) {
+            localStorage.setItem('ilham_notes', JSON.stringify(data));
+        }
+
+        // Fungsi Hapus
+        window.deleteNote = (index) => {
+            const notes = getNotes();
+            notes.splice(index, 1);
+            save(notes);
+            renderAll(notes);
+        }
+
+        // Fungsi Render (Tampilkan ke Layar)
+        function renderAll(notes) {
+            list.innerHTML = '';
+            notes.forEach((note, index) => {
+                const card = document.createElement('div');
+                card.className = 'note-card';
+                card.innerHTML = `
+                    <div class="note-text">${note}</div>
+                    <md-icon-button onclick="deleteNote(${index})">
+                        <md-icon>delete</md-icon>
+                    </md-icon-button>
                 `;
-
-                // Gesture Attachments
-                attachGestures(el, note.id);
-                notesGrid.appendChild(el);
-            });
-
-            // UI State updates
-            if (state.selectionMode) {
-                selectionHeader.classList.add('active');
-                selectionCount.textContent = state.selectedIds.size;
-            } else {
-                selectionHeader.classList.remove('active');
-            }
-        }
-
-        // --- GESTURE LOGIC (Swipe, Tap, Double Tap, Long Press) ---
-        function attachGestures(element, id) {
-            let touchStartX = 0;
-            let touchStartY = 0;
-            let lastTapTime = 0;
-            let pressTimer;
-            let isDragging = false;
-
-            // 1. Long Press (Select)
-            const startPress = () => {
-                pressTimer = setTimeout(() => {
-                    toggleSelection(id);
-                    navigator.vibrate(50); // Haptic feedback
-                    isDragging = true; // Prevent click trigger
-                }, 600);
-            };
-
-            const cancelPress = () => clearTimeout(pressTimer);
-
-            // 2. Touch Events
-            element.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-                touchStartY = e.changedTouches[0].screenY;
-                startPress();
-            }, {passive: true});
-
-            element.addEventListener('touchmove', (e) => {
-                const currentX = e.changedTouches[0].screenX;
-                const currentY = e.changedTouches[0].screenY;
-                const diffX = currentX - touchStartX;
-                const diffY = currentY - touchStartY;
-
-                // Cancel long press if moving
-                if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) cancelPress();
-
-                // Swipe Logic (Only horizontal)
-                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 20) {
-                    element.style.transform = `translateX(${diffX}px)`;
-                    element.style.opacity = 1 - Math.abs(diffX) / 300;
-                }
-            }, {passive: true});
-
-            element.addEventListener('touchend', (e) => {
-                cancelPress();
-                const currentX = e.changedTouches[0].screenX;
-                const diffX = currentX - touchStartX;
-
-                // Threshold for delete
-                if (Math.abs(diffX) > 150) {
-                    // Delete Animation
-                    element.style.transition = 'transform 0.2s, height 0.2s';
-                    element.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
-                    setTimeout(() => deleteNote(id), 200);
-                } else {
-                    // Reset
-                    element.style.transform = '';
-                    element.style.opacity = '';
-                }
-
-                if (isDragging) {
-                    isDragging = false;
-                    return;
-                }
-            });
-
-            // 3. Click Logic (Single vs Double)
-            element.addEventListener('click', (e) => {
-                if (Math.abs(e.screenX - touchStartX) > 10) return; // Ignore if it was a swipe
-
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTapTime;
-
-                if (state.selectionMode) {
-                    toggleSelection(id);
-                } else {
-                    if (tapLength < 300 && tapLength > 0) {
-                        // Double Tap
-                        toggleExpand(id);
-                    } else {
-                        // Single Tap (Debounced to wait for potential double tap)
-                        // In real strict apps we might delay, but for responsiveness we usually fire open immediately 
-                        // unless it's a known conflict. Here we'll just check if it's not expanding.
-                        setTimeout(() => {
-                           if (new Date().getTime() - lastTapTime >= 300) {
-                               openEditor(id);
-                           }
-                        }, 300);
-                    }
-                }
-                lastTapTime = currentTime;
+                list.appendChild(card);
             });
         }
-
-        // --- ACTIONS ---
-        function toggleSelection(id) {
-            if (state.selectedIds.has(id)) {
-                state.selectedIds.delete(id);
-                if (state.selectedIds.size === 0) state.selectionMode = false;
-            } else {
-                state.selectedIds.add(id);
-                state.selectionMode = true;
-            }
-            render();
-        }
-
-        function toggleExpand(id) {
-            const note = state.notes.find(n => n.id === id);
-            // Collapse others if we want single focus, or allow multiple.
-            // Requirement: "Note lain bergeser" (Masonry flow handles this naturally)
-            note.expanded = !note.expanded;
-            render();
-        }
-
-        function deleteNote(id) {
-            state.notes = state.notes.filter(n => n.id !== id);
-            render();
-        }
-
-        // --- EDITOR LOGIC ---
-        let currentEditingId = null;
-
-        function openEditor(id = null) {
-            const dialog = document.getElementById('editorDialog');
-            const titleInput = document.getElementById('editTitle');
-            const contentInput = document.getElementById('editContent');
-            const tagsInput = document.getElementById('editTags');
-
-            currentEditingId = id;
-
-            if (id) {
-                const note = state.notes.find(n => n.id === id);
-                titleInput.value = note.title;
-                contentInput.value = note.content;
-                tagsInput.value = note.tags.join(', ');
-            } else {
-                titleInput.value = '';
-                contentInput.value = '';
-                tagsInput.value = '';
-            }
-
-            dialog.show(); // Material Web Dialog method
-        }
-
-        document.getElementById('fabAdd').addEventListener('click', () => openEditor());
-
-        document.getElementById('editorCancel').addEventListener('click', () => {
-            document.getElementById('editorDialog').close();
-        });
-
-        document.getElementById('editorSave').addEventListener('click', () => {
-            const title = document.getElementById('editTitle').value;
-            const content = document.getElementById('editContent').value;
-            const tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
-
-            if (currentEditingId) {
-                const note = state.notes.find(n => n.id === currentEditingId);
-                note.title = title;
-                note.content = content;
-                note.tags = tags;
-            } else {
-                state.notes.unshift({
-                    id: Date.now().toString(),
-                    title, content, tags, color: 'default', expanded: false
-                });
-            }
-
-            document.getElementById('editorDialog').close();
-            render();
-        });
-
-        // --- BATCH ACTIONS ---
-        document.getElementById('closeSelection').addEventListener('click', () => {
-            state.selectionMode = false;
-            state.selectedIds.clear();
-            render();
-        });
-
-        document.getElementById('batchDelete').addEventListener('click', () => {
-            state.notes = state.notes.filter(n => !state.selectedIds.has(n.id));
-            state.selectionMode = false;
-            state.selectedIds.clear();
-            render();
-        });
-
-        // --- DRAWER & MENU ---
-        const drawer = document.getElementById('mainDrawer');
-        const overlay = document.getElementById('drawerOverlay');
-        const menuBtn = document.getElementById('menuBtn');
-
-        function toggleDrawer() {
-            drawer.classList.toggle('open');
-            overlay.classList.toggle('open');
-        }
-
-        menuBtn.addEventListener('click', toggleDrawer);
-        overlay.addEventListener('click', toggleDrawer);
-
-        // --- EXPORT / IMPORT ---
-        document.getElementById('btnExport').addEventListener('click', () => {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.notes));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "dinduy_backup.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        });
-
-        document.getElementById('btnImport').addEventListener('click', () => {
-            document.getElementById('fileInput').click();
-        });
-
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                try {
-                    const imported = JSON.parse(event.target.result);
-                    state.notes = [...imported, ...state.notes]; // Merge
-                    render();
-                    alert('Impor Berhasil!');
-                } catch (e) {
-                    alert('File rusak brow');
-                }
-            };
-            reader.readAsText(file);
-        });
-
-        // --- INIT ---
-        render();
-
     </script>
 </body>
 </html>
-
