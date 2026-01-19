@@ -2,194 +2,531 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catatan Ilham</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dinduy Notes</title>
+
+    <!-- FONT & ICONS -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Product+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 
+    <!-- STYLE GLOBAL (Theme Tokens) -->
     <style>
         :root {
+            /* M3 Dark Theme Token Simulation */
             --md-sys-color-background: #141218;
             --md-sys-color-on-background: #E6E1E5;
-            --md-sys-color-surface-container: #2B2930;
-            --md-sys-color-primary: #D0BCFF; /* Ungu Material */
+            --md-sys-color-surface: #141218;
+            --md-sys-color-surface-container: #211F26;
+            --md-sys-color-surface-container-high: #2B2930;
+            --md-sys-color-primary: #D0BCFF;
             --md-sys-color-on-primary: #381E72;
+            --md-sys-color-primary-container: #4F378B;
+            --md-sys-color-on-primary-container: #EADDFF;
+            --md-sys-color-secondary-container: #4A4458;
+            --md-sys-color-outline: #938F99;
+            --md-sys-color-outline-variant: #49454F;
+            
             font-family: 'Roboto', sans-serif;
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
+            user-select: none; /* App-like feel */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--md-sys-color-background);
-            color: var(--md-sys-color-on-background);
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 500px;
-            padding: 16px;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            overflow: hidden;
         }
 
-        /* HEADER */
-        .header {
-            font-size: 28px; /* Display Small */
-            font-weight: 400;
-            padding: 16px 0;
+        /* --- LAYOUT COMPONENTS --- */
+
+        /* Top Bar */
+        .top-app-bar {
+            height: 64px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--md-sys-color-surface);
+            z-index: 10;
+        }
+
+        .search-container {
+            flex: 1;
+            height: 48px;
+            background: var(--md-sys-color-surface-container-high);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            color: var(--md-sys-color-outline);
+        }
+
+        /* Drawer (Sidebar) */
+        .drawer-scrim {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 20;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .drawer-scrim.open { opacity: 1; pointer-events: auto; }
+
+        .drawer {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 300px;
+            background: var(--md-sys-color-surface-container);
+            z-index: 21;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+            border-radius: 0 16px 16px 0;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .drawer.open { transform: translateX(0); }
+        
+        .brand-logo {
+            font-family: 'Product Sans', sans-serif;
+            font-size: 24px;
+            padding: 24px 16px;
             color: var(--md-sys-color-on-background);
         }
 
-        /* INPUT SECTION */
-        .input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        /* Main Content Grid */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+            gap: 12px;
+            align-content: start;
+            /* Hide scrollbar */
+            scrollbar-width: none; 
         }
+        .content-area::-webkit-scrollbar { display: none; }
 
-        md-outlined-text-field {
-            width: 100%;
-            --md-outlined-text-field-container-shape: 16px;
-        }
-
-        /* CARD LIST */
-        .note-list {
+        /* --- NOTE CARD --- */
+        .note-card {
+            position: relative;
+            background: var(--md-sys-color-surface-container);
+            border: 1px solid var(--md-sys-color-outline-variant);
+            border-radius: 12px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            height: fit-content;
+            max-height: 200px;
+            cursor: pointer;
+            touch-action: pan-y; /* Allow vertical scroll */
         }
 
-        /* CARD STYLE (Manual override dikit biar mirip M3E) */
-        .note-card {
-            background-color: var(--md-sys-color-surface-container);
-            padding: 16px;
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-            animation: fadeIn 0.3s ease;
+        /* Selection State */
+        .note-card.selected {
+            background: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            border-color: transparent;
+            transform: scale(0.95);
         }
 
-        .note-text {
+        /* Expanded State (Ngintip) */
+        .note-card.expanded {
+            grid-column: 1 / -1;
+            max-height: 500px;
+            z-index: 5;
+            box-shadow: 0 4px 8px 3px rgba(0,0,0,0.2);
+            border-color: var(--md-sys-color-outline);
+        }
+
+        .note-title {
+            font-weight: 500;
             font-size: 16px;
-            line-height: 1.5;
-            flex: 1;
-            margin-right: 10px;
+        }
+        
+        .note-body {
+            font-size: 14px;
+            opacity: 0.8;
+            white-space: pre-line;
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .note-card.expanded .note-body { -webkit-line-clamp: unset; }
+
+        /* Chips/Tags */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .chip {
+            font-size: 11px;
+            background: rgba(255,255,255,0.08);
+            padding: 4px 8px;
+            border-radius: 6px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* FAB */
+        .fab-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10;
         }
+
+        /* Editor Dialog Customization */
+        md-dialog {
+            --md-dialog-container-color: var(--md-sys-color-surface-container-high);
+            min-width: 320px;
+        }
+        
+        .editor-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-top: 8px;
+        }
+
+        /* Selection Header Overlay */
+        .selection-bar {
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 64px;
+            background: var(--md-sys-color-surface-container);
+            display: flex; align-items: center;
+            padding: 0 16px;
+            transform: translateY(-100%);
+            transition: transform 0.2s;
+            z-index: 15;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+        }
+        .selection-bar.active { transform: translateY(0); }
+
     </style>
 
+    <!-- OFFICIAL GOOGLE MATERIAL WEB IMPORT -->
     <script type="importmap">
-      {
-        "imports": {
-          "@material/web/": "https://esm.run/@material/web/"
-        }
+    {
+      "imports": {
+        "@material/web/": "https://esm.sh/@material/web@1.0.0/"
       }
+    }
     </script>
     <script type="module">
-      import '@material/web/all.js';
-      import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
-      document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+        import '@material/web/all.js';
+        import { styles as typescaleStyles } from '@material/web/typography/md-typescale-styles.js';
+        document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
     </script>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="header">Catatan Ilham</div>
-
-        <div class="input-group">
-            <md-outlined-text-field label="Mau nyatet apa hari ini?" id="inputNote">
-            </md-outlined-text-field>
-            
-            <md-filled-button id="btnSave">
-                <md-icon slot="icon">save</md-icon>
-                Simpan
-            </md-filled-button>
-        </div>
-
-        <div id="listContainer" class="note-list">
-            </div>
+    <!-- 1. SELECTION HEADER (Hidden by default) -->
+    <div class="selection-bar" id="selectionBar">
+        <md-icon-button id="btnCloseSelection"><md-icon>close</md-icon></md-icon-button>
+        <span id="selectionCount" style="flex:1; margin-left:12px; font-size:18px; font-weight:500;">1</span>
+        <md-icon-button id="btnBatchLabel"><md-icon>label</md-icon></md-icon-button>
+        <md-icon-button id="btnBatchDelete"><md-icon>delete</md-icon></md-icon-button>
     </div>
 
-    <script>
-        const input = document.getElementById('inputNote');
-        const btn = document.getElementById('btnSave');
-        const list = document.getElementById('listContainer');
+    <!-- 2. MAIN APP BAR -->
+    <div class="top-app-bar">
+        <md-icon-button id="btnMenu"><md-icon>menu</md-icon></md-icon-button>
+        <div class="search-container">
+            <md-icon>search</md-icon>
+            <span>Cari di Dinduy...</span>
+        </div>
+        <!-- Profile Picture Removed as requested -->
+        <md-icon-button><md-icon>grid_view</md-icon></md-icon-button>
+    </div>
 
-        // Data Awal (Dummy) biar gak kosong pas lu buka
-        const defaultNotes = [
-            "Beli cat air baru buat kanvas semi-realism",
-            "Jadwal kuliah Sejarah: Besok jam 8 pagi",
-            "Tentang Dinda: Jangan lupa kasih kado buku Fisika Quantum"
+    <!-- 3. DRAWER (SIDEBAR) -->
+    <div class="drawer-scrim" id="drawerScrim"></div>
+    <div class="drawer" id="mainDrawer">
+        <div class="brand-logo">Dinduy</div>
+        
+        <!-- Navigation Items -->
+        <md-text-button id="navNotes">
+            <md-icon slot="icon">lightbulb</md-icon>
+            Catatan
+        </md-text-button>
+        <md-text-button id="navExport">
+            <md-icon slot="icon">file_download</md-icon>
+            Ekspor JSON
+        </md-text-button>
+        <md-text-button id="navImport">
+            <md-icon slot="icon">file_upload</md-icon>
+            Impor JSON
+            <input type="file" id="fileInput" hidden>
+        </md-text-button>
+    </div>
+
+    <!-- 4. CONTENT GRID -->
+    <div class="content-area" id="notesGrid">
+        <!-- Cards injected by JS -->
+    </div>
+
+    <!-- 5. FAB -->
+    <div class="fab-container">
+        <md-fab variant="primary" id="fabAdd">
+            <md-icon slot="icon">add</md-icon>
+        </md-fab>
+    </div>
+
+    <!-- 6. EDITOR DIALOG -->
+    <md-dialog id="editorDialog">
+        <div slot="headline">Catatan Baru</div>
+        <form slot="content" id="editorForm" method="dialog" class="editor-form">
+            <md-outlined-text-field label="Judul" id="inputTitle" type="text"></md-outlined-text-field>
+            <md-outlined-text-field label="Catatan" id="inputContent" type="textarea" rows="5"></md-outlined-text-field>
+            <md-outlined-text-field label="Label (pisahkan koma)" id="inputTags" type="text" placeholder="Contoh: UNJ, Fisika"></md-outlined-text-field>
+        </form>
+        <div slot="actions">
+            <md-text-button form="editorForm" value="cancel">Batal</md-text-button>
+            <md-filled-button form="editorForm" value="save" id="btnSave">Simpan</md-filled-button>
+        </div>
+    </md-dialog>
+
+    <!-- LOGIC -->
+    <script>
+        // --- DATA STORE ---
+        let notes = [
+            { id: '1', title: 'Ide Lukisan', content: 'Semi realism wajah manusia setengah akar pohon. Background nebula. Butuh cat minyak baru.', tags: ['Art', 'Hobi'] },
+            { id: '2', title: 'Tugas Kuliah', content: 'Resume buku sejarah peradaban romawi kuno bab 5-8. Deadline senin depan.', tags: ['UNJ', 'Sejarah'] },
+            { id: '3', title: 'List Belanja', content: 'Rokok Ziga, Kanvas 40x60, Kopi sachet.', tags: ['Penting'] },
+            { id: '4', title: 'Buat Dinda', content: 'Cari buku referensi Fisika Kuantum buat hadiah ultah. Atau ajak makan di Blok M Rawamangun?', tags: ['Love'] }
         ];
 
-        // Load saat aplikasi dibuka
-        document.addEventListener('DOMContentLoaded', () => {
-            const saved = JSON.parse(localStorage.getItem('ilham_notes'));
-            if (!saved || saved.length === 0) {
-                // Kalo kosong, pake data dummy dulu
-                renderAll(defaultNotes);
-                localStorage.setItem('ilham_notes', JSON.stringify(defaultNotes));
-            } else {
-                renderAll(saved);
-            }
-        });
+        let selectedIds = new Set();
+        let selectionMode = false;
+        let currentEditId = null;
 
-        // Klik Tombol Simpan
-        btn.addEventListener('click', () => {
-            const val = input.value;
-            if(!val) return;
+        // --- DOM ELEMENTS ---
+        const grid = document.getElementById('notesGrid');
+        const selectionBar = document.getElementById('selectionBar');
+        const selectionCount = document.getElementById('selectionCount');
+        const dialog = document.getElementById('editorDialog');
+        const drawer = document.getElementById('mainDrawer');
+        const scrim = document.getElementById('drawerScrim');
 
-            const notes = getNotes();
-            notes.unshift(val); // Tambah ke paling atas
-            save(notes);
-            renderAll(notes);
-            input.value = ''; // Reset input
-        });
+        // --- RENDER ENGINE ---
+        function render() {
+            grid.innerHTML = '';
+            notes.forEach(note => {
+                const el = document.createElement('div');
+                const isSelected = selectedIds.has(note.id);
+                el.className = `note-card ${isSelected ? 'selected' : ''}`;
+                el.dataset.id = note.id;
 
-        // Fungsi Baca Data
-        function getNotes() {
-            return JSON.parse(localStorage.getItem('ilham_notes') || '[]');
-        }
-
-        // Fungsi Simpan ke HP
-        function save(data) {
-            localStorage.setItem('ilham_notes', JSON.stringify(data));
-        }
-
-        // Fungsi Hapus
-        window.deleteNote = (index) => {
-            const notes = getNotes();
-            notes.splice(index, 1);
-            save(notes);
-            renderAll(notes);
-        }
-
-        // Fungsi Render (Tampilkan ke Layar)
-        function renderAll(notes) {
-            list.innerHTML = '';
-            notes.forEach((note, index) => {
-                const card = document.createElement('div');
-                card.className = 'note-card';
-                card.innerHTML = `
-                    <div class="note-text">${note}</div>
-                    <md-icon-button onclick="deleteNote(${index})">
-                        <md-icon>delete</md-icon>
-                    </md-icon-button>
+                // Content Construction
+                let tagsHtml = note.tags.map(t => `<span class="chip">#${t}</span>`).join('');
+                el.innerHTML = `
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-body">${note.content}</div>
+                    <div class="chip-container">${tagsHtml}</div>
+                    <md-ripple></md-ripple>
                 `;
-                list.appendChild(card);
+
+                attachGestures(el, note.id);
+                grid.appendChild(el);
+            });
+
+            // Update Selection UI
+            if (selectionMode) {
+                selectionBar.classList.add('active');
+                selectionCount.innerText = selectedIds.size;
+            } else {
+                selectionBar.classList.remove('active');
+            }
+        }
+
+        // --- GESTURE LOGIC (Core Feature) ---
+        function attachGestures(el, id) {
+            let touchStartX = 0;
+            let touchStartY = 0;
+            let timer;
+            let lastTap = 0;
+            let isSwiping = false;
+
+            // 1. Long Press (Select)
+            const startPress = () => {
+                timer = setTimeout(() => {
+                    navigator.vibrate(50);
+                    toggleSelection(id);
+                    isSwiping = true; // prevent click
+                }, 600);
+            };
+
+            const cancelPress = () => clearTimeout(timer);
+
+            el.addEventListener('touchstart', e => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                startPress();
+            }, {passive: true});
+
+            el.addEventListener('touchmove', e => {
+                const diffX = e.touches[0].clientX - touchStartX;
+                const diffY = e.touches[0].clientY - touchStartY;
+
+                // Cancel long press if moving much
+                if (Math.abs(diffX) > 10 || Math.abs(diffY) > 10) cancelPress();
+
+                // Swipe Logic (Horizontal Only)
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+                    isSwiping = true;
+                    el.style.transform = `translateX(${diffX}px)`;
+                    el.style.opacity = 1 - Math.abs(diffX)/300;
+                }
+            }, {passive: true});
+
+            el.addEventListener('touchend', e => {
+                cancelPress();
+                const diffX = e.changedTouches[0].clientX - touchStartX;
+
+                if (Math.abs(diffX) > 150) {
+                    // Swipe Delete Action
+                    el.style.transition = '0.2s';
+                    el.style.transform = diffX > 0 ? 'translateX(100vw)' : 'translateX(-100vw)';
+                    setTimeout(() => {
+                        notes = notes.filter(n => n.id !== id);
+                        render();
+                    }, 200);
+                } else {
+                    // Reset
+                    el.style.transform = '';
+                    el.style.opacity = '';
+                    // Allow click if not swiped much
+                    if (Math.abs(diffX) < 10) isSwiping = false;
+                }
+            });
+
+            // 2. Click & Double Tap
+            el.addEventListener('click', e => {
+                if (isSwiping) return;
+
+                const now = new Date().getTime();
+                const isDoubleTap = (now - lastTap) < 300 && (now - lastTap) > 0;
+
+                if (selectionMode) {
+                    toggleSelection(id);
+                } else if (isDoubleTap) {
+                    // Double Tap: Expand (Ngintip)
+                    el.classList.toggle('expanded');
+                    // Collapse others
+                    document.querySelectorAll('.note-card').forEach(c => {
+                        if(c !== el) c.classList.remove('expanded');
+                    });
+                } else {
+                    // Single Tap: Edit (Debounced slightly to allow double tap)
+                    // For UX responsiveness we open immediately here, 
+                    // double tap effectively becomes "Open then Expand" visually if not debounced.
+                    // Let's debounce slightly.
+                    setTimeout(() => {
+                        if (new Date().getTime() - lastTap >= 300) {
+                             if (!el.classList.contains('expanded')) openEditor(id);
+                        }
+                    }, 310);
+                }
+                lastTap = now;
             });
         }
+
+        // --- ACTIONS ---
+        function toggleSelection(id) {
+            if (selectedIds.has(id)) {
+                selectedIds.delete(id);
+                if (selectedIds.size === 0) selectionMode = false;
+            } else {
+                selectedIds.add(id);
+                selectionMode = true;
+            }
+            render();
+        }
+
+        function openEditor(id) {
+            currentEditId = id;
+            const note = id ? notes.find(n => n.id === id) : { title: '', content: '', tags: [] };
+            
+            document.getElementById('inputTitle').value = note.title;
+            document.getElementById('inputContent').value = note.content;
+            document.getElementById('inputTags').value = note.tags.join(', ');
+            
+            dialog.show();
+        }
+
+        // --- BUTTON EVENTS ---
+        document.getElementById('fabAdd').addEventListener('click', () => openEditor(null));
+
+        document.getElementById('btnSave').addEventListener('click', () => {
+            const title = document.getElementById('inputTitle').value;
+            const content = document.getElementById('inputContent').value;
+            const tags = document.getElementById('inputTags').value.split(',').filter(t => t.trim() !== '').map(t => t.trim());
+
+            if (currentEditId) {
+                const idx = notes.findIndex(n => n.id === currentEditId);
+                if (idx > -1) notes[idx] = { ...notes[idx], title, content, tags };
+            } else {
+                notes.unshift({ id: Date.now().toString(), title, content, tags });
+            }
+            dialog.close();
+            render();
+        });
+
+        document.getElementById('btnCloseSelection').addEventListener('click', () => {
+            selectionMode = false;
+            selectedIds.clear();
+            render();
+        });
+
+        document.getElementById('btnBatchDelete').addEventListener('click', () => {
+            if(!confirm('Hapus ' + selectedIds.size + ' catatan?')) return;
+            notes = notes.filter(n => !selectedIds.has(n.id));
+            selectionMode = false;
+            selectedIds.clear();
+            render();
+        });
+
+        // Drawer Logic
+        const toggleDrawer = () => {
+            drawer.classList.toggle('open');
+            scrim.classList.toggle('open');
+        };
+        document.getElementById('btnMenu').addEventListener('click', toggleDrawer);
+        scrim.addEventListener('click', toggleDrawer);
+
+        // Export Import
+        document.getElementById('navExport').addEventListener('click', () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(notes));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "dinduy_backup.json");
+            dlAnchorElem.click();
+        });
+        
+        document.getElementById('navImport').addEventListener('click', () => document.getElementById('fileInput').click());
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const reader = new FileReader();
+            reader.onload = event => {
+                notes = JSON.parse(event.target.result);
+                render();
+                toggleDrawer();
+            };
+            reader.readAsText(e.target.files[0]);
+        });
+
+        // Init
+        render();
     </script>
 </body>
 </html>
+
