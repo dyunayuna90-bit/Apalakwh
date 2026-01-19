@@ -1,5 +1,5 @@
 {
-  "name": "catatan-m3e-ilham",
+  "name": "catatan-dinduy-ilham",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,9 +10,7 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "lit": "^3.0.0",
-    "@m3e/all": "latest"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
