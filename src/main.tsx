@@ -2,8 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 
-// Import SEMUA komponen M3E di sini biar ke-load
-import '@m3e/all'; 
+// Gak perlu import @m3e lagi di sini karena udah di index.html
+// import '@m3e/all';  <-- INI YANG BIKIN ERROR TADI, KITA BUANG
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
