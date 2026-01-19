@@ -3,15 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Catatan Ilham</title>
+    <title>Catatan Dinduy</title>
+    
+    <!-- 1. Font & Icon Wajib -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded" rel="stylesheet">
+    
+    <!-- 2. Styling Reset -->
     <style>
-      body { margin: 0; background: #141218; }
+      body { margin: 0; background: #141218; height: 100vh; overflow: hidden; }
     </style>
+
+    <!-- 3. BYPASS ERROR: Load Library Pake Import Map -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@m3e/all": "https://esm.sh/@m3e/all?bundle",
+          "@m3e/core": "https://esm.sh/@m3e/core",
+          "lit": "https://esm.sh/lit@3.0.0"
+        }
+      }
+    </script>
+    
+    <!-- 4. Panggil Library-nya -->
+    <script type="module">
+      import "@m3e/all";
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+
